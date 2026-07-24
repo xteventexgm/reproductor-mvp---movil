@@ -563,8 +563,8 @@ function renderizarRecientes() {
 
     btn.className = 'reciente-item'
     btn.innerHTML = `
-  <span>🔎 ${texto}</span>
-  <span class="eliminar-reciente">✕</span>
+  <span><i class="ph ph-magnifying-glass"></i> ${texto}</span>
+  <span class="eliminar-reciente"><i class="ph-bold ph-x"></i></span>
 `
     btn.addEventListener('click', () => {
       inputBusqueda.value = texto
@@ -651,8 +651,8 @@ btnPlayPause.addEventListener('click', conmutarReproduccion)
 btnPlayPauseFull.addEventListener('click', conmutarReproduccion)
 
 reproductor.addEventListener('play', () => {
-  btnPlayPause.innerText = '⏸'
-  btnPlayPauseFull.innerText = '⏸'
+  btnPlayPause.innerHTML = '<i class="ph-fill ph-pause"></i>'
+  btnPlayPauseFull.innerHTML = '<i class="ph-fill ph-pause"></i>'
   imgDiscoFull.style.animationPlayState = 'running'
   if (colaDeReproduccion.length > 0) {
     const cancion = colaDeReproduccion[indiceCancionActual]
@@ -673,8 +673,8 @@ reproductor.addEventListener('play', () => {
 })
 
 reproductor.addEventListener('pause', () => {
-  btnPlayPause.innerText = '▶'
-  btnPlayPauseFull.innerText = '▶'
+  btnPlayPause.innerHTML = '<i class="ph-fill ph-play"></i>'
+  btnPlayPauseFull.innerHTML = '<i class="ph-fill ph-play"></i>'
   imgDiscoFull.style.animationPlayState = 'paused'
   MediaSession.setPlaybackState({ playbackState: 'paused' })
 })
@@ -919,8 +919,8 @@ function detenerReproductor() {
   barraProgresoFull.value = 0
   tiempoActual.innerText = '0:00'
   tiempoActualFull.innerText = '0:00'
-  btnPlayPause.innerText = '▶'
-  btnPlayPauseFull.innerText = '▶'
+  btnPlayPause.innerHTML = '<i class="ph-fill ph-play"></i>'
+  btnPlayPauseFull.innerHTML = '<i class="ph-fill ph-play"></i>'
   textoReproductor.innerText = 'No hay música sonando'
   tituloFull.innerText = 'No hay música sonando'
   artistaFull.innerText = '--'
@@ -1239,7 +1239,7 @@ async function actualizarInterfazPlaylists() {
 
       // --- NUEVO: Botón de Compartir por QR ---
       const btnCompartirQR = document.createElement('button')
-      btnCompartirQR.innerHTML = '🔗'
+      btnCompartirQR.innerHTML = '<i class="ph-bold ph-link"></i>'
       btnCompartirQR.className = 'btn-compartir-playlist'
       btnCompartirQR.style.cssText =
         estiloBotonUniforme + 'background-color: #00bcd4; color: black;'
@@ -1274,11 +1274,11 @@ async function actualizarInterfazPlaylists() {
             'background-color: #333; color: white; width: auto; padding: 0 15px; border-radius: 20px;'
           btnLote.disabled = true
         } else if (faltanPorDescargar) {
-          btnLote.innerHTML = '⬇️'
+          btnLote.innerHTML = '<i class="ph-bold ph-download-simple"></i>'
           btnLote.style.cssText = estiloBotonUniforme + 'background-color: #333; color: white;'
           btnLote.disabled = false
         } else {
-          btnLote.innerHTML = '✔️'
+          btnLote.innerHTML = '<i class="ph-bold ph-check-circle"></i>'
           btnLote.style.cssText = estiloBotonUniforme + 'background-color: #4CAF50; color: white;'
           btnLote.disabled = true
         }
@@ -1286,7 +1286,7 @@ async function actualizarInterfazPlaylists() {
         divAccionesPl.appendChild(btnLote)
 
         const btnLimpiarDescargas = document.createElement('button')
-        btnLimpiarDescargas.innerHTML = '🧹'
+        btnLimpiarDescargas.innerHTML = '<i class="ph-bold ph-broom"></i>'
         btnLimpiarDescargas.style.cssText =
           estiloBotonUniforme + 'background-color: #ff9800; color: black;'
         btnLimpiarDescargas.addEventListener('click', async () => {
@@ -1294,7 +1294,7 @@ async function actualizarInterfazPlaylists() {
             `¿Deseas borrar los MP3 descargados de "${nombre}" para liberar espacio?`
           )
           if (seguro) {
-            btnLimpiarDescargas.innerHTML = '⏳'
+            btnLimpiarDescargas.innerHTML = '<i class="ph-bold ph-hourglass"></i>'
             let borrados = 0
             for (const track of misPlaylists[nombre]) {
               const nombreLimpio = track.titulo.replace(/[\\/:*?"<>|]/g, '')
@@ -1312,7 +1312,7 @@ async function actualizarInterfazPlaylists() {
       }
 
       const btnEliminarPl = document.createElement('button')
-      btnEliminarPl.innerHTML = '🗑️'
+      btnEliminarPl.innerHTML = '<i class="ph-bold ph-trash"></i>'
       btnEliminarPl.className = 'btn-eliminar-playlist'
       btnEliminarPl.style.cssText = estiloBotonUniforme + 'background-color: #d32f2f; color: white;'
       btnEliminarPl.addEventListener('click', async () => {
@@ -1365,8 +1365,8 @@ async function actualizarInterfazPlaylists() {
             'width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center; border:none; border-radius:6px; font-weight:bold; font-size:1.1rem; flex-shrink: 0;'
 
           btnBajarHTML = descargada
-            ? `<button class="btn-borrar-descarga" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:#ff9800; color:black;">🗑️</button>`
-            : `<button class="btn-descargar" data-url="${track.urlYoutube}" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:var(--accent); color:black;">⬇️</button>`
+            ? `<button class="btn-borrar-descarga" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:#ff9800; color:black;"><i class="ph-bold ph-trash"></i></button>`
+            : `<button class="btn-descargar" data-url="${track.urlYoutube}" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:var(--accent); color:black;"><i class="ph-bold ph-download-simple"></i></button>`
         }
 
         const comboMover = renderOpcionesCombo(
@@ -3198,4 +3198,99 @@ async function abrirModalGestionCancion(pOrigen, titulo) {
     overlay.appendChild(modal)
     document.body.appendChild(overlay)
   })
+}
+
+// ==========================================
+//   NUEVO: ONBOARDING Y ECUALIZADOR (NEÓN)
+// ==========================================
+
+// --- ONBOARDING LOGIC ---
+const onboardingOverlay = document.getElementById('onboarding-overlay')
+const btnEmpezarOnboarding = document.getElementById('btnEmpezarOnboarding')
+
+if (onboardingOverlay && btnEmpezarOnboarding) {
+  const hasSeenOnboarding = localStorage.getItem('myplayer_onboarding_done')
+  if (!hasSeenOnboarding) {
+    onboardingOverlay.classList.remove('vista-oculta')
+    btnEmpezarOnboarding.addEventListener('click', () => {
+      onboardingOverlay.classList.add('fade-out')
+      localStorage.setItem('myplayer_onboarding_done', 'true')
+      setTimeout(() => {
+        onboardingOverlay.classList.add('vista-oculta')
+      }, 500)
+    })
+  }
+}
+
+// --- ECUALIZADOR VISUAL (WEB AUDIO API) ---
+const canvasEcualizador = document.getElementById('ecualizadorVisual')
+if (canvasEcualizador && reproductor) {
+  const ctx = canvasEcualizador.getContext('2d')
+  canvasEcualizador.width = 320
+  canvasEcualizador.height = 320
+  
+  let audioContext = null
+  let analyser = null
+  let dataArray = null
+  let source = null
+  
+  const initAudio = () => {
+    if (!audioContext) {
+      try {
+        reproductor.crossOrigin = 'anonymous'
+        audioContext = new (window.AudioContext || window.webkitAudioContext)()
+        analyser = audioContext.createAnalyser()
+        source = audioContext.createMediaElementSource(reproductor)
+        
+        source.connect(analyser)
+        analyser.connect(audioContext.destination)
+        
+        analyser.fftSize = 128
+        const bufferLength = analyser.frequencyBinCount
+        dataArray = new Uint8Array(bufferLength)
+        
+        dibujarEcualizador()
+      } catch (e) {
+        console.warn('Ecualizador no disponible por políticas de CORS en esta fuente de audio.', e)
+      }
+    }
+    if (audioContext && audioContext.state === 'suspended') {
+      audioContext.resume()
+    }
+  }
+  
+  reproductor.addEventListener('play', initAudio)
+  
+  function dibujarEcualizador() {
+    requestAnimationFrame(dibujarEcualizador)
+    if (!analyser) return
+    
+    analyser.getByteFrequencyData(dataArray)
+    ctx.clearRect(0, 0, canvasEcualizador.width, canvasEcualizador.height)
+    
+    const centerX = canvasEcualizador.width / 2
+    const centerY = canvasEcualizador.height / 2
+    const radius = 140 
+    
+    const bars = dataArray.length
+    const barWidth = (2 * Math.PI) / bars
+    
+    for (let i = 0; i < bars; i++) {
+      const barHeight = (dataArray[i] / 255) * 35 
+      const angle = i * barWidth
+      
+      const x1 = centerX + Math.cos(angle) * radius
+      const y1 = centerY + Math.sin(angle) * radius
+      const x2 = centerX + Math.cos(angle) * (radius + barHeight)
+      const y2 = centerY + Math.sin(angle) * (radius + barHeight)
+      
+      ctx.beginPath()
+      ctx.moveTo(x1, y1)
+      ctx.lineTo(x2, y2)
+      ctx.lineWidth = 4
+      ctx.strokeStyle = `rgba(0, 240, 255, ${Math.max(0.2, dataArray[i]/255)})`
+      ctx.lineCap = 'round'
+      ctx.stroke()
+    }
+  }
 }
