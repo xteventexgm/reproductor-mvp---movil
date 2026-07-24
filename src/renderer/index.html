@@ -9,9 +9,17 @@
 
     <title>Reproductor MVP</title>
 
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Orbitron:wght@400;700;900&family=Sora:wght@300;400;600&display=swap" rel="stylesheet">
+    
+    <!-- Phosphor Icons -->
+    <script src="https://unpkg.com/@phosphor-icons/web"></script>
+
     <link rel="stylesheet" href="/src/styles.css" />
     <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
-  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+    <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
   </head>
 
   <body>
@@ -21,7 +29,7 @@
     ========================== -->
 <main id="vista-busqueda" class="vista-activa vista-contenido">
         <div class="header-mobile">
-          <h2 class="brand">🎵 MyPlayer MVP</h2>
+          <h2 class="brand"><i class="ph-fill ph-waveform"></i> MyPlayer Neón</h2>
           <p class="subtitle">Encuentra tu música favorita</p>
         </div>
 
@@ -34,7 +42,7 @@
         <!-- ===== CONTENIDO INICIAL BUSQUEDA ===== -->
         <div id="inicioBusqueda">
           <div class="hero-busqueda">
-            <div class="hero-icono">🎵</div>
+            <div class="hero-icono"><i class="ph-duotone ph-music-notes"></i></div>
 
             <h2>Busca cualquier canción</h2>
 
@@ -56,7 +64,7 @@
           <!-- RECIENTES -->
           <div class="busquedas-recientes">
             <div class="header-recientes">
-              <h3>🕓 Recientes</h3>
+              <h3><i class="ph ph-clock-counter-clockwise"></i> Recientes</h3>
 
               <button id="btnLimpiarRecientes">Limpiar</button>
             </div>
@@ -76,7 +84,7 @@
           <div class="playlist-form">
             <input type="text" id="inputNuevaPlaylist" placeholder="Crear playlist..." />
 
-            <button id="btnCrearPlaylist">+</button>
+            <button id="btnCrearPlaylist"><i class="ph-bold ph-plus"></i></button>
           </div>
 
           <div id="contenedorPlaylists" class="playlist-list"></div>
@@ -94,8 +102,8 @@
 
       <div class="settings-container" style="padding: 0 20px; margin-top: 20px;">
 
-        <div class="settings-section" style="background: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-          <h3 style="color: white; margin-bottom: 15px; font-size: 1.1rem;">🔗 Importar desde YouTube</h3>
+        <div class="settings-section" style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 0 15px rgba(255, 46, 196, 0.1);">
+          <h3 style="color: white; margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;"><i class="ph-fill ph-youtube-logo" style="color: #ff0000;"></i> Importar desde YouTube</h3>
           <input type="text" id="inputLinkCancion" placeholder="Pegar link de canción..." style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: #333; color: white;">
           <button id="btnImportarCancion" style="width: 100%; padding: 12px; background: white; color: black; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">Añadir Canción</button>
           
@@ -103,25 +111,25 @@
           <button id="btnImportarMix" style="width: 100%; padding: 12px; background: #ff0000; color: white; border: none; border-radius: 8px; font-weight: bold;">Escanear Playlist Completa</button>
         </div>
 
-         <div class="settings-section" style="background: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 80px;">
-          <h3 style="color: #4CAF50; margin-bottom: 15px; font-size: 1.1rem;">💾 Copia de Seguridad Local</h3>
-          <button id="btnCrearBackup" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">Exportar Playlists (JSON)</button>
+         <div class="settings-section" style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 80px; border: 1px solid var(--border); box-shadow: 0 0 15px rgba(0, 240, 255, 0.1);">
+          <h3 style="color: var(--accent-cyan); margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;"><i class="ph-fill ph-floppy-disk"></i> Copia de Seguridad Local</h3>
+          <button id="btnCrearBackup" style="width: 100%; padding: 12px; background: var(--accent-cyan); color: black; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px; box-shadow: 0 0 10px rgba(0,240,255,0.4);">Exportar Playlists (JSON)</button>
           
           <input type="file" id="inputRestaurarBackup" accept=".json" style="display: none;" />
           
-          <button id="btnRestaurarBackupUI" style="width: 100%; padding: 12px; border: 1px solid #4CAF50; color: #4CAF50; background: transparent; border-radius: 8px; font-weight: bold;">Restaurar / agregar playlist</button>
+          <button id="btnRestaurarBackupUI" style="width: 100%; padding: 12px; border: 1px solid var(--accent-cyan); color: var(--accent-cyan); background: transparent; border-radius: 8px; font-weight: bold;">Restaurar / agregar playlist</button>
           
           <p style="font-size: 0.8rem; color: #888; margin-top: 10px; text-align: center;">Exporta a tu carpeta de Documentos, importa desde cualquier ubicación.</p>
         </div>
 
-       <div class="settings-section" style="background: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
-          <h3 style="color: #00bcd4; margin-bottom: 15px; font-size: 1.1rem;">📷 Recibir por QR</h3>
-          <button id="btnAbrirEscaner" style="width: 100%; padding: 12px; background: #00bcd4; color: black; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px;">Escanear con la Cámara</button>
+       <div class="settings-section" style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 25px; border: 1px solid var(--border); box-shadow: 0 0 15px rgba(198, 255, 0, 0.1);">
+          <h3 style="color: var(--accent-lime); margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; gap: 8px;"><i class="ph-fill ph-qr-code"></i> Recibir por QR</h3>
+          <button id="btnAbrirEscaner" style="width: 100%; padding: 12px; background: var(--accent-lime); color: black; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px; box-shadow: 0 0 10px rgba(198, 255, 0, 0.4);">Escanear con la Cámara</button>
           
           <input type="file" id="inputQrImagen" accept="image/*" style="display: none;">
-          <button id="btnEscanearImagen" style="width: 100%; padding: 12px; border: 1px solid #00bcd4; color: #00bcd4; background: transparent; border-radius: 8px; font-weight: bold;">Escanear desde Galería 🖼️</button>
+          <button id="btnEscanearImagen" style="width: 100%; padding: 12px; border: 1px solid var(--accent-lime); color: var(--accent-lime); background: transparent; border-radius: 8px; font-weight: bold;"><i class="ph-bold ph-image"></i> Escanear desde Galería</button>
 
-          <div id="lector-qr-container" style="display: none; width: 100%; overflow: hidden; border-radius: 8px; margin-top: 15px; border: 2px solid #00bcd4;">
+          <div id="lector-qr-container" style="display: none; width: 100%; overflow: hidden; border-radius: 8px; margin-top: 15px; border: 2px solid var(--accent-lime);">
             <div id="lector-qr"></div>
             <button id="btnCerrarEscaner" style="width: 100%; padding: 10px; background: #d32f2f; color: white; border: none; font-weight: bold;">Cancelar / Cerrar Cámara</button>
           </div>
@@ -134,7 +142,7 @@
     ========================== -->
       <div id="vista-playlist-detalle" class="vista-contenido vista-oculta vista-superpuesta">
         <div class="header-mobile header-detalle">
-          <button id="btnVolverBiblioteca" class="btn-volver">⬅️</button>
+          <button id="btnVolverBiblioteca" class="btn-volver"><i class="ph-bold ph-caret-left"></i></button>
 
           <h2 id="tituloPlaylistDetalle" class="brand">Playlist</h2>
         </div>
@@ -163,13 +171,13 @@
         </div>
 
         <div class="player-buttons">
-          <button id="btnAleatorio" class="ctrl-btn" title="Aleatorio">🔀</button>
+          <button id="btnAleatorio" class="ctrl-btn" title="Aleatorio"><i class="ph-fill ph-shuffle"></i></button>
 
-          <button id="btnAnterior" class="ctrl-btn" title="Anterior">⏮</button>
+          <button id="btnAnterior" class="ctrl-btn" title="Anterior"><i class="ph-fill ph-skip-back"></i></button>
 
-          <button id="btnPlayPause" class="ctrl-btn play-btn" title="Reproducir">▶</button>
+          <button id="btnPlayPause" class="ctrl-btn play-btn" title="Reproducir"><i class="ph-fill ph-play"></i></button>
 
-          <button id="btnSiguiente" class="ctrl-btn" title="Siguiente">⏭</button>
+          <button id="btnSiguiente" class="ctrl-btn" title="Siguiente"><i class="ph-fill ph-skip-forward"></i></button>
         </div>
 
         <audio id="reproductor"></audio>
@@ -181,17 +189,17 @@
   ========================== -->
     <nav class="bottom-nav">
       <button id="btn-tab-buscar" class="tab-btn tab-activo">
-        <span class="icon">🔍</span>
+        <span class="icon"><i class="ph ph-magnifying-glass"></i></span>
         <span class="tab-label">Buscar</span>
       </button>
 
       <button id="btn-tab-biblioteca" class="tab-btn">
-        <span class="icon">📚</span>
+        <span class="icon"><i class="ph ph-books"></i></span>
         <span class="tab-label">Biblioteca</span>
       </button>
 
       <button id="btn-tab-perfil" class="tab-btn">
-        <span class="icon">👤</span>
+        <span class="icon"><i class="ph ph-user"></i></span>
         <span class="tab-label">Perfil</span>
       </button>
     </nav>
@@ -202,16 +210,17 @@
   ========================== -->
     <div id="vista-reproductor" class="cerrado">
       <div class="header-reproductor">
-        <button id="btnCerrarReproductor">🔽</button>
+        <button id="btnCerrarReproductor"><i class="ph-bold ph-caret-down"></i></button>
 
-        <span style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px">
+        <span style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px; font-family: 'Orbitron', sans-serif;">
           REPRODUCIENDO AHORA
         </span>
 
-        <button style="opacity: 0">🔽</button>
+        <button style="opacity: 0"><i class="ph-bold ph-caret-down"></i></button>
       </div>
 
       <div class="disco-container">
+        <canvas id="ecualizadorVisual"></canvas>
         <img
           id="imgDiscoFull"
           src="https://cdn-icons-png.flaticon.com/512/26/26307.png"
@@ -238,23 +247,31 @@
       </div>
 
      <div class="controles-principales-full">
-      <button id="btnAleatorioFull" class="btn-circular-secundario">🔀</button>
-      <button id="btnAnteriorFull">⏮</button>
-      <button id="btnPlayPauseFull" class="btn-play-grande">▶</button>
-      <button id="btnSiguienteFull">⏭</button>
+      <button id="btnAleatorioFull" class="btn-circular-secundario"><i class="ph-fill ph-shuffle"></i></button>
+      <button id="btnAnteriorFull"><i class="ph-fill ph-skip-back"></i></button>
+      <button id="btnPlayPauseFull" class="btn-play-grande"><i class="ph-fill ph-play"></i></button>
+      <button id="btnSiguienteFull"><i class="ph-fill ph-skip-forward"></i></button>
       
-      <button id="btnVerColaFull" class="btn-circular-secundario">☰</button>
+      <button id="btnVerColaFull" class="btn-circular-secundario"><i class="ph-fill ph-list-dashes"></i></button>
     </div>
 
     <div id="panelColaFull" class="panel-cola-oculto">
       <div class="header-cola">
         <h3>Cola de reproducción</h3>
-        <button id="btnCerrarColaFull">❌</button>
+        <button id="btnCerrarColaFull"><i class="ph-bold ph-x"></i></button>
       </div>
       <ul id="listaColaFull" class="song-list"></ul>
     </div>
 
+    <div id="onboarding-overlay" class="vista-oculta">
+      <div class="onboarding-content">
+        <i class="ph-duotone ph-headphones onboarding-icon"></i>
+        <h1 class="brand" style="justify-content: center;">MyPlayer Neón</h1>
+        <p>Tu música favorita con la mejor experiencia visual cyberpunk. Disfruta del modo offline y animaciones fluidas.</p>
+        <button id="btnEmpezarOnboarding" class="btn-empezar">¡Empezar a Escuchar!</button>
+      </div>
+    </div>
+
     <script type="module" src="/src/renderer.js"></script>
-    
   </body>
 </html>
