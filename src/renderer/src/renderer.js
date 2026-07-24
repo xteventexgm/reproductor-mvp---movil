@@ -1,8 +1,13 @@
+/* eslint-disable no-empty */
+/* eslint-disable no-unused-vars */
 import '../../../src/styles.css'
 import { Preferences } from '@capacitor/preferences'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { MediaSession } from '@capgo/capacitor-media-session'
 import { App } from '@capacitor/app'
+import { initCarMode } from './modules/carMode.js'
+import { initStorageManager } from './modules/storageManager.js'
+import { initRecommendations } from './modules/recommendations.js'
 
 // --- 1. SELECCIÓN DE ELEMENTOS DEL DOM ---
 const vistaBusqueda = document.getElementById('vista-busqueda')
@@ -109,10 +114,24 @@ const apiMovil = {
           titulo: f.name.replace('.mp3', ''),
           rutaAbsoluta: f.name
         }))
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
-      await Filesystem.mkdir({ path: 'MiMusicaMVP', directory: Directory.Data, recursive: true })
       return []
+    }
+  },
+
+  obtenerTamanioCarpeta: async () => {
+    try {
+      const result = await Filesystem.readdir({ path: 'MiMusicaMVP', directory: Directory.Data })
+      let totalBytes = 0
+      for (const file of result.files) {
+        if (file.name.endsWith('.mp3') && file.size) {
+          totalBytes += file.size
+        }
+      }
+      const mb = (totalBytes / (1024 * 1024)).toFixed(2)
+      return { bytes: totalBytes, formateado: `${mb} MB` }
+    } catch (e) {
+      return { bytes: 0, formateado: '0 MB' }
     }
   },
 
@@ -125,7 +144,6 @@ const apiMovil = {
         directory: Directory.Data
       })
       return window.Capacitor ? window.Capacitor.convertFileSrc(fileUri.uri) : fileUri.uri
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return null // No hay miniatura guardada localmente
     }
@@ -140,7 +158,6 @@ const apiMovil = {
         directory: Directory.Data
       })
       return window.Capacitor ? window.Capacitor.convertFileSrc(fileUri.uri) : fileUri.uri
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return null
     }
@@ -157,13 +174,11 @@ const apiMovil = {
       // Borramos la miniatura si existe (en bloque try interno para evitar caídas si no tiene)
       try {
         await Filesystem.deleteFile({ path: `MiMusicaMVP/${thumbName}`, directory: Directory.Data })
-        // eslint-disable-next-line no-unused-vars
       } catch (e) {
         console.log('No había miniatura física que borrar.')
       }
 
       return true
-      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return false
     }
@@ -368,7 +383,6 @@ const apiMovil = {
       const res = await fetch(url)
       const data = await res.json()
       return data.items?.[0]?.snippet?.title || 'Mix Importado'
-      // eslint-disable-next-line no-unused-vars
     } catch (e) {
       return 'Mix Importado'
     }
@@ -739,7 +753,7 @@ function generarOrdenAleatorio(indiceFijo) {
   // 2. Mezclamos los índices de forma aleatoria
   for (let i = poolAleatorio.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-    ;[poolAleatorio[i], poolAleatorio[j]] = [poolAleatorio[j], poolAleatorio[i]]
+      ;[poolAleatorio[i], poolAleatorio[j]] = [poolAleatorio[j], poolAleatorio[i]]
   }
 
   // 3. Ponemos la canción actual al principio para que el reproductor no salte
@@ -888,8 +902,8 @@ async function reproductorCentralControl() {
     if (rutaImgLocal) {
       caratulaFinal = rutaImgLocal
     }
-    // eslint-disable-next-line no-unused-vars, no-empty
-  } catch (e) {}
+
+  } catch (e) { }
 
   // Sincronización de metadatos nativos (Capacitor)
   MediaSession.setMetadata({
@@ -1000,7 +1014,10 @@ function cambiarPestaña(vistaAActivar, botonAActivar) {
 // 4. Conectamos los clics de tu HTML con la función maestra
 btnTabBuscar.addEventListener('click', () => cambiarPestaña(vistaBusqueda, btnTabBuscar))
 btnTabBiblioteca.addEventListener('click', () => cambiarPestaña(vistaBiblioteca, btnTabBiblioteca))
-btnTabPerfil.addEventListener('click', () => cambiarPestaña(vistaPerfil, btnTabPerfil))
+btnTabPerfil.addEventListener('click', () => {
+  cambiarPestaña(vistaPerfil, btnTabPerfil)
+  if (storageManager) storageManager.updateSize()
+})
 
 // --- 7. RENDERIZADO MAESTRO DE PLAYLISTS (MÁXIMO RENDIMIENTO Y OFFLINE) ---
 
@@ -1020,7 +1037,7 @@ async function obtenerCacheLocal() {
       if (name.endsWith('_thumb.jpg')) thumbs.add(name.replace('_thumb.jpg', ''))
     })
     return { mp3, thumbs, baseUrl }
-    // eslint-disable-next-line no-unused-vars
+
   } catch (e) {
     return { mp3: new Set(), thumbs: new Set(), baseUrl: '' }
   }
@@ -1139,8 +1156,7 @@ async function actualizarInterfazPlaylists() {
         try {
           const u = new URL(track.urlYoutube)
           videoId = u.hostname.includes('youtu.be') ? u.pathname.slice(1) : u.searchParams.get('v')
-          // eslint-disable-next-line no-unused-vars, no-empty
-        } catch (e) {}
+        } catch (e) { }
       }
 
       // 2. El Doble Escudo (Original -> Servidor Anti-Bloqueos -> Icono Genérico)
@@ -1386,8 +1402,8 @@ async function actualizarInterfazPlaylists() {
             videoId = u.hostname.includes('youtu.be')
               ? u.pathname.slice(1)
               : u.searchParams.get('v')
-            // eslint-disable-next-line no-unused-vars, no-empty
-          } catch (e) {}
+
+          } catch (e) { }
         }
 
         // 2. El Doble Escudo (Original -> Servidor Anti-Bloqueos -> Icono Genérico)
@@ -2243,8 +2259,8 @@ async function renderizarColaFull() {
       try {
         const u = new URL(track.urlYoutube)
         videoId = u.hostname.includes('youtu.be') ? u.pathname.slice(1) : u.searchParams.get('v')
-        // eslint-disable-next-line no-unused-vars, no-empty
-      } catch (e) {}
+
+      } catch (e) { }
     }
 
     // 2. El Doble Escudo (Original -> Servidor Anti-Bloqueos -> Icono Genérico)
@@ -2363,7 +2379,7 @@ async function comprobarInternetReal() {
     // Intentamos cargar un archivo minúsculo sin caché y sin bloqueos de seguridad (no-cors)
     await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' })
     return true // Si no hay error, hay internet real
-    // eslint-disable-next-line no-unused-vars
+
   } catch (error) {
     return false // Si falla el fetch, estamos desconectados
   }
@@ -2557,7 +2573,7 @@ if (btnImportarCancion) {
           videoId = url.searchParams.get('v')
         }
       }
-      // eslint-disable-next-line no-unused-vars
+
     } catch (e) {
       // Plan B: Si pegan solo el ID de 11 caracteres en vez de un enlace completo
       if (urlText.length === 11) videoId = urlText
@@ -2844,7 +2860,7 @@ async function generarQR(nombrePlaylist, canciones) {
         const url = new URL(c.urlYoutube)
         if (url.hostname.includes('youtu.be')) return url.pathname.slice(1)
         return url.searchParams.get('v')
-        // eslint-disable-next-line no-unused-vars
+
       } catch (e) {
         return null
       }
@@ -2985,8 +3001,8 @@ if (btnAbrirEscaner) {
 
           await procesarTextoQR(decodedText) // Llamamos a la función maestra
         },
-        // eslint-disable-next-line no-unused-vars
-        (errorMessage) => {} // Ignoramos errores de enfoque
+
+        (errorMessage) => { } // Ignoramos errores de enfoque
       )
     } catch (err) {
       console.error(err)
@@ -3033,7 +3049,7 @@ if (btnEscanearImagen && inputQrImagen) {
       inputQrImagen.value = '' // Limpiamos el input por si quiere subir la misma foto luego
       await procesarTextoQR(decodedText) // Llamamos a la función maestra
 
-      // eslint-disable-next-line no-unused-vars
+
     } catch (err) {
       mostrarToast('❌ No se detectó ningún código QR en la imagen seleccionada.')
       inputQrImagen.value = ''
@@ -3228,12 +3244,12 @@ if (canvasEcualizador && reproductor) {
   const ctx = canvasEcualizador.getContext('2d')
   canvasEcualizador.width = 320
   canvasEcualizador.height = 320
-  
+
   let audioContext = null
   let analyser = null
   let dataArray = null
   let source = null
-  
+
   const initAudio = () => {
     if (!audioContext) {
       try {
@@ -3241,14 +3257,14 @@ if (canvasEcualizador && reproductor) {
         audioContext = new (window.AudioContext || window.webkitAudioContext)()
         analyser = audioContext.createAnalyser()
         source = audioContext.createMediaElementSource(reproductor)
-        
+
         source.connect(analyser)
         analyser.connect(audioContext.destination)
-        
+
         analyser.fftSize = 128
         const bufferLength = analyser.frequencyBinCount
         dataArray = new Uint8Array(bufferLength)
-        
+
         dibujarEcualizador()
       } catch (e) {
         console.warn('Ecualizador no disponible por políticas de CORS en esta fuente de audio.', e)
@@ -3258,39 +3274,94 @@ if (canvasEcualizador && reproductor) {
       audioContext.resume()
     }
   }
-  
+
   reproductor.addEventListener('play', initAudio)
-  
+
   function dibujarEcualizador() {
     requestAnimationFrame(dibujarEcualizador)
     if (!analyser) return
-    
+
     analyser.getByteFrequencyData(dataArray)
     ctx.clearRect(0, 0, canvasEcualizador.width, canvasEcualizador.height)
-    
+
     const centerX = canvasEcualizador.width / 2
     const centerY = canvasEcualizador.height / 2
-    const radius = 140 
-    
+    const radius = 140
+
     const bars = dataArray.length
     const barWidth = (2 * Math.PI) / bars
-    
+
     for (let i = 0; i < bars; i++) {
-      const barHeight = (dataArray[i] / 255) * 35 
+      const barHeight = (dataArray[i] / 255) * 35
       const angle = i * barWidth
-      
+
       const x1 = centerX + Math.cos(angle) * radius
       const y1 = centerY + Math.sin(angle) * radius
       const x2 = centerX + Math.cos(angle) * (radius + barHeight)
       const y2 = centerY + Math.sin(angle) * (radius + barHeight)
-      
+
       ctx.beginPath()
       ctx.moveTo(x1, y1)
       ctx.lineTo(x2, y2)
       ctx.lineWidth = 4
-      ctx.strokeStyle = `rgba(0, 240, 255, ${Math.max(0.2, dataArray[i]/255)})`
+      ctx.strokeStyle = `rgba(0, 240, 255, ${Math.max(0.2, dataArray[i] / 255)})`
       ctx.lineCap = 'round'
       ctx.stroke()
     }
   }
 }
+
+// --- MINI-PLAYER (PICTURE IN PICTURE) ---
+const btnMiniPlayer = document.getElementById('btnMiniPlayer')
+let isMiniPlayerActive = false
+
+if (btnMiniPlayer) {
+  btnMiniPlayer.addEventListener('click', async () => {
+    if (window.api && window.api.toggleMiniPlayer) {
+      isMiniPlayerActive = !isMiniPlayerActive
+      await window.api.toggleMiniPlayer(isMiniPlayerActive)
+      if (isMiniPlayerActive) {
+        btnMiniPlayer.innerHTML = '<i class="ph-fill ph-picture-in-picture"></i>'
+        btnMiniPlayer.style.color = 'var(--accent)'
+      } else {
+        btnMiniPlayer.innerHTML = '<i class="ph-bold ph-picture-in-picture"></i>'
+        btnMiniPlayer.style.color = 'inherit'
+      }
+    } else {
+      mostrarToast('Modo Mini-Player no disponible (solo en PC)')
+    }
+  })
+}
+
+// --- INIT CAR MODE ---
+initCarMode({
+  onPlayPause: () => btnPlayPauseFull.click(),
+  onPrev: () => btnAnteriorFull.click(),
+  onNext: () => btnSiguienteFull.click()
+})
+
+// --- INIT STORAGE MANAGER ---
+const storageManager = initStorageManager({
+  getPlaylists: () => misPlaylists,
+  onSpaceFreed: (msg) => mostrarToast(msg)
+})
+
+// --- INIT RECOMENDACIONES LOCALES ---
+setTimeout(() => {
+  initRecommendations({
+    getRecientes: () => busquedasRecientes,
+    onPlaySuggested: async (cancionObj) => {
+      // Agregar a la cola y reproducir inmediatamente
+      colaDeReproduccion = [cancionObj]
+      indiceCancionActual = 0
+      poolAleatorio = [0]
+      cursorAleatorio = 0
+      btnPlayPauseFull.click() // Simula el click para abrir el modal si es necesario, 
+      // o llama a reproductorCentralControl directamente
+      await reproductorCentralControl()
+
+      // Abrir fullscreen player automáticamente para mayor inmersión
+      document.getElementById('vista-reproductor').classList.replace('cerrado', 'abierto')
+    }
+  })
+}, 1000) // Cargar despues del render inicial para no bloquear
