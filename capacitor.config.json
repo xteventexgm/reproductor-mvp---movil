@@ -1,0 +1,11 @@
+{
+  "appId": "com.mvp.reproductor",
+  "appName": "Reproductor MVP",
+  "webDir": "out/renderer",
+  "bundledWebRuntime": false,
+  "plugins": {
+    "CapacitorHttp": {
+      "enabled": true
+    }
+  }
+}

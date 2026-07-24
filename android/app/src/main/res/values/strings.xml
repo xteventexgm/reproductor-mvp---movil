@@ -1,0 +1,7 @@
+<?xml version='1.0' encoding='utf-8'?>
+<resources>
+    <string name="app_name">Reproductor MVP</string>
+    <string name="title_activity_main">Reproductor MVP</string>
+    <string name="package_name">com.mvp.reproductor</string>
+    <string name="custom_url_scheme">com.mvp.reproductor</string>
+</resources>

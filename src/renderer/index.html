@@ -1,0 +1,260 @@
+<!doctype html>
+<html lang="es">
+  <head>
+    <meta charset="UTF-8" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no, viewport-fit=cover"
+    />
+
+    <title>Reproductor MVP</title>
+
+    <link rel="stylesheet" href="/src/styles.css" />
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/qrious/4.0.2/qrious.min.js"></script>
+  <script src="https://unpkg.com/html5-qrcode" type="text/javascript"></script>
+  </head>
+
+  <body>
+    <div class="app-container">
+      <!-- =========================
+         VISTA BUSQUEDA
+    ========================== -->
+<main id="vista-busqueda" class="vista-activa vista-contenido">
+        <div class="header-mobile">
+          <h2 class="brand">🎵 MyPlayer MVP</h2>
+          <p class="subtitle">Encuentra tu música favorita</p>
+        </div>
+
+        <div class="search-bar-container">
+          <input type="text" id="inputBusqueda" placeholder="¿Qué deseas escuchar hoy?" />
+
+          <button id="btnBuscar">Buscar</button>
+        </div>
+
+        <!-- ===== CONTENIDO INICIAL BUSQUEDA ===== -->
+        <div id="inicioBusqueda">
+          <div class="hero-busqueda">
+            <div class="hero-icono">🎵</div>
+
+            <h2>Busca cualquier canción</h2>
+
+            <p>Reproduce música online o descárgala para escuchar sin internet</p>
+          </div>
+
+          <!-- CATEGORIAS -->
+          <div class="categorias-rapidas">
+            <button class="chip-busqueda">Rock</button>
+            <button class="chip-busqueda">Reggaeton</button>
+            <button class="chip-busqueda">LoFi</button>
+            <button class="chip-busqueda">Trap</button>
+            <button class="chip-busqueda">Anime</button>
+            <button class="chip-busqueda">Electrónica</button>
+            <button class="chip-busqueda">Pop</button>
+            <button class="chip-busqueda">Indie</button>
+          </div>
+
+          <!-- RECIENTES -->
+          <div class="busquedas-recientes">
+            <div class="header-recientes">
+              <h3>🕓 Recientes</h3>
+
+              <button id="btnLimpiarRecientes">Limpiar</button>
+            </div>
+            <div id="contenedorRecientes"></div>
+          </div>
+        </div>
+        <ul id="listaBusqueda" class="song-list"></ul>
+      </main>
+
+      <!-- =========================
+         VISTA BIBLIOTECA
+    ========================== -->
+      <main id="vista-biblioteca" class="vista-oculta vista-contenido">
+        <div class="playlist-manager">
+          <h3>Mis Playlists</h3>
+
+          <div class="playlist-form">
+            <input type="text" id="inputNuevaPlaylist" placeholder="Crear playlist..." />
+
+            <button id="btnCrearPlaylist">+</button>
+          </div>
+
+          <div id="contenedorPlaylists" class="playlist-list"></div>
+        </div>
+      </main>
+
+<!-- =========================
+        Mi Cuenta
+    ========================== -->
+      <main id="vista-perfil" class="vista-oculta vista-contenido">
+      <div class="header-mobile">
+        <h2>Mi Cuenta</h2>
+        <p class="subtitle">Ajustes y copias de seguridad</p>
+      </div>
+
+      <div class="settings-container" style="padding: 0 20px; margin-top: 20px;">
+
+        <div class="settings-section" style="background: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+          <h3 style="color: white; margin-bottom: 15px; font-size: 1.1rem;">🔗 Importar desde YouTube</h3>
+          <input type="text" id="inputLinkCancion" placeholder="Pegar link de canción..." style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: #333; color: white;">
+          <button id="btnImportarCancion" style="width: 100%; padding: 12px; background: white; color: black; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">Añadir Canción</button>
+          
+          <input type="text" id="inputLinkPlaylist" placeholder="Pegar link de mix/playlist..." style="width: 100%; padding: 12px; margin-bottom: 10px; border-radius: 8px; border: none; background: #333; color: white;">
+          <button id="btnImportarMix" style="width: 100%; padding: 12px; background: #ff0000; color: white; border: none; border-radius: 8px; font-weight: bold;">Escanear Playlist Completa</button>
+        </div>
+
+         <div class="settings-section" style="background: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 80px;">
+          <h3 style="color: #4CAF50; margin-bottom: 15px; font-size: 1.1rem;">💾 Copia de Seguridad Local</h3>
+          <button id="btnCrearBackup" style="width: 100%; padding: 12px; background: #4CAF50; color: white; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 15px;">Exportar Playlists (JSON)</button>
+          
+          <input type="file" id="inputRestaurarBackup" accept=".json" style="display: none;" />
+          
+          <button id="btnRestaurarBackupUI" style="width: 100%; padding: 12px; border: 1px solid #4CAF50; color: #4CAF50; background: transparent; border-radius: 8px; font-weight: bold;">Restaurar / agregar playlist</button>
+          
+          <p style="font-size: 0.8rem; color: #888; margin-top: 10px; text-align: center;">Exporta a tu carpeta de Documentos, importa desde cualquier ubicación.</p>
+        </div>
+
+       <div class="settings-section" style="background: #1e1e1e; padding: 20px; border-radius: 12px; margin-bottom: 25px;">
+          <h3 style="color: #00bcd4; margin-bottom: 15px; font-size: 1.1rem;">📷 Recibir por QR</h3>
+          <button id="btnAbrirEscaner" style="width: 100%; padding: 12px; background: #00bcd4; color: black; border: none; border-radius: 8px; font-weight: bold; margin-bottom: 10px;">Escanear con la Cámara</button>
+          
+          <input type="file" id="inputQrImagen" accept="image/*" style="display: none;">
+          <button id="btnEscanearImagen" style="width: 100%; padding: 12px; border: 1px solid #00bcd4; color: #00bcd4; background: transparent; border-radius: 8px; font-weight: bold;">Escanear desde Galería 🖼️</button>
+
+          <div id="lector-qr-container" style="display: none; width: 100%; overflow: hidden; border-radius: 8px; margin-top: 15px; border: 2px solid #00bcd4;">
+            <div id="lector-qr"></div>
+            <button id="btnCerrarEscaner" style="width: 100%; padding: 10px; background: #d32f2f; color: white; border: none; font-weight: bold;">Cancelar / Cerrar Cámara</button>
+          </div>
+        </div>
+      </div>
+    </main>
+
+      <!-- =========================
+         DETALLE PLAYLIST
+    ========================== -->
+      <div id="vista-playlist-detalle" class="vista-contenido vista-oculta vista-superpuesta">
+        <div class="header-mobile header-detalle">
+          <button id="btnVolverBiblioteca" class="btn-volver">⬅️</button>
+
+          <h2 id="tituloPlaylistDetalle" class="brand">Playlist</h2>
+        </div>
+
+        <div id="controlesPlaylistDetalle"></div>
+
+        <ul id="listaPlaylistDetalle" class="song-list" style="margin-top: 15px"></ul>
+      </div>
+    </div>
+
+    <!-- =========================
+       PLAYER BAR
+  ========================== -->
+    <footer class="player-bar">
+      <div class="player-info">
+        <p id="textoReproductor">No hay música sonando</p>
+      </div>
+
+      <div class="player-controls-container">
+        <div class="player-progress">
+          <span id="tiempoActual"> 0:00 </span>
+
+          <input type="range" id="barraProgreso" value="0" min="0" max="100" />
+
+          <span id="tiempoTotal"> 0:00 </span>
+        </div>
+
+        <div class="player-buttons">
+          <button id="btnAleatorio" class="ctrl-btn" title="Aleatorio">🔀</button>
+
+          <button id="btnAnterior" class="ctrl-btn" title="Anterior">⏮</button>
+
+          <button id="btnPlayPause" class="ctrl-btn play-btn" title="Reproducir">▶</button>
+
+          <button id="btnSiguiente" class="ctrl-btn" title="Siguiente">⏭</button>
+        </div>
+
+        <audio id="reproductor"></audio>
+      </div>
+    </footer>
+
+    <!-- =========================
+       BOTTOM NAV
+  ========================== -->
+    <nav class="bottom-nav">
+      <button id="btn-tab-buscar" class="tab-btn tab-activo">
+        <span class="icon">🔍</span>
+        <span class="tab-label">Buscar</span>
+      </button>
+
+      <button id="btn-tab-biblioteca" class="tab-btn">
+        <span class="icon">📚</span>
+        <span class="tab-label">Biblioteca</span>
+      </button>
+
+      <button id="btn-tab-perfil" class="tab-btn">
+        <span class="icon">👤</span>
+        <span class="tab-label">Perfil</span>
+      </button>
+    </nav>
+
+    
+    <!-- =========================
+       REPRODUCTOR FULLSCREEN
+  ========================== -->
+    <div id="vista-reproductor" class="cerrado">
+      <div class="header-reproductor">
+        <button id="btnCerrarReproductor">🔽</button>
+
+        <span style="font-size: 0.8rem; font-weight: bold; letter-spacing: 1px">
+          REPRODUCIENDO AHORA
+        </span>
+
+        <button style="opacity: 0">🔽</button>
+      </div>
+
+      <div class="disco-container">
+        <img
+          id="imgDiscoFull"
+          src="https://cdn-icons-png.flaticon.com/512/26/26307.png"
+          alt="Disco"
+        />
+      </div>
+
+      <div class="info-reproductor-full">
+        <h2 id="tituloFull">No hay música sonando</h2>
+
+        <p id="artistaFull">--</p>
+      </div>
+
+      <div id="opcionesFullContainer"></div>
+
+      <div class="progreso-full-container">
+        <div class="tiempos-full">
+          <span id="tiempoActualFull"> 0:00 </span>
+
+          <span id="tiempoTotalFull"> 0:00 </span>
+        </div>
+
+        <input type="range" id="barraProgresoFull" value="0" max="100" />
+      </div>
+
+     <div class="controles-principales-full">
+      <button id="btnAleatorioFull" class="btn-circular-secundario">🔀</button>
+      <button id="btnAnteriorFull">⏮</button>
+      <button id="btnPlayPauseFull" class="btn-play-grande">▶</button>
+      <button id="btnSiguienteFull">⏭</button>
+      
+      <button id="btnVerColaFull" class="btn-circular-secundario">☰</button>
+    </div>
+
+    <div id="panelColaFull" class="panel-cola-oculto">
+      <div class="header-cola">
+        <h3>Cola de reproducción</h3>
+        <button id="btnCerrarColaFull">❌</button>
+      </div>
+      <ul id="listaColaFull" class="song-list"></ul>
+    </div>
+
+    <script type="module" src="/src/renderer.js"></script>
+    
+  </body>
+</html>
