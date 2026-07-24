@@ -78,9 +78,10 @@
               <button id="btnLimpiarRecientes">Limpiar</button>
             </div>
             <div id="contenedorRecientes"></div>
+            </div>
           </div>
-        </div>
-        <ul id="listaBusqueda" class="song-list"></ul>
+          </div>
+          <ul id="listaBusqueda" class="song-list"></ul>
       </main>
 
       <!-- =========================
@@ -175,8 +176,26 @@
             <button id="btnAddApiKey" style="padding: 0 20px; background: #ffc107; color: black; border: none; border-radius: 8px; font-weight: bold;"><i class="ph-bold ph-plus"></i></button>
           </div>
           
-          <button id="btnResetApiKeys" style="width: 100%; padding: 10px; border: 1px solid #ffc107; color: #ffc107; background: transparent; border-radius: 8px; font-weight: bold; font-size: 0.85rem;">Restaurar llaves por defecto</button>
+          <button id="btnResetApiKeys" style="width: 100%; padding: 10px; border: 1px solid #ffc107; color: #ffc107; background: transparent; border-radius: 8px; font-weight: bold; font-size: 0.85rem; margin-bottom: 20px;">Restaurar llaves por defecto</button>
+
+          <hr style="border-color: #333; margin-bottom: 20px;">
+
+          <h3 style="color: #ff0000; margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="ph-fill ph-youtube-logo"></i> Llave de YouTube (Búsquedas)</span>
+          </h3>
+          <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px;">
+            La aplicación necesita una llave de YouTube Data API v3 para buscar canciones y playlists. 
+            Si las búsquedas fallan, significa que la llave se quedó sin cuota. <a href="https://console.cloud.google.com/apis/library/youtube.googleapis.com" target="_blank" style="color: #ff0000; text-decoration: underline;">Consigue una llave de Google Cloud gratis aquí</a>.
+          </p>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input type="text" id="inputYoutubeKey" placeholder="Pegar YouTube API Key..." style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #333; color: white;">
+            <button id="btnSaveYoutubeKey" style="padding: 0 20px; background: #ff0000; color: white; border: none; border-radius: 8px; font-weight: bold;"><i class="ph-bold ph-floppy-disk"></i></button>
+          </div>
+          <button id="btnResetYoutubeKey" style="width: 100%; padding: 10px; border: 1px solid #ff0000; color: #ff0000; background: transparent; border-radius: 8px; font-weight: bold; font-size: 0.85rem;">Restaurar llave por defecto</button>
+
         </div>
+
 
       </div>
     </main>
@@ -269,6 +288,7 @@
           id="imgDiscoFull"
           src="https://cdn-icons-png.flaticon.com/512/26/26307.png"
           alt="Disco"
+          referrerpolicy="no-referrer"
         />
       </div>
 

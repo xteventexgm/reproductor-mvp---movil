@@ -101,4 +101,59 @@ export async function initApiConfig() {
 
   // Render inicial
   renderizarLista()
+
+  // ==========================================
+  // LÓGICA PARA YOUTUBE API KEY
+  // ==========================================
+  const inputYoutubeKey = document.getElementById('inputYoutubeKey')
+  const btnSaveYoutubeKey = document.getElementById('btnSaveYoutubeKey')
+  const btnResetYoutubeKey = document.getElementById('btnResetYoutubeKey')
+
+  if (inputYoutubeKey && btnSaveYoutubeKey && btnResetYoutubeKey) {
+    // 1. Cargar llave guardada
+    let miYoutubeKey = window.youtubeKeyPorDefecto
+    try {
+      const data = await Preferences.get({ key: 'miYoutubeKeyCustom' })
+      if (data.value) {
+        miYoutubeKey = data.value
+        if (window.actualizarYoutubeKey) window.actualizarYoutubeKey(miYoutubeKey)
+      }
+    } catch (e) {
+      console.error('Error al cargar YouTube Key', e)
+    }
+
+    // Mostrar en el input (ocultando parte por seguridad)
+    inputYoutubeKey.value = miYoutubeKey
+
+    // 2. Guardar
+    btnSaveYoutubeKey.addEventListener('click', async () => {
+      const nueva = inputYoutubeKey.value.trim()
+      if (!nueva) return
+      
+      try {
+        await Preferences.set({ key: 'miYoutubeKeyCustom', value: nueva })
+        miYoutubeKey = nueva
+        if (window.actualizarYoutubeKey) window.actualizarYoutubeKey(miYoutubeKey)
+        alert('Llave de YouTube guardada exitosamente.')
+      } catch (e) {
+        console.error(e)
+      }
+    })
+
+    // 3. Reset
+    btnResetYoutubeKey.addEventListener('click', async () => {
+      const confirmar = confirm('¿Seguro que deseas restaurar la llave de YouTube por defecto?')
+      if (confirmar) {
+        try {
+          miYoutubeKey = window.youtubeKeyPorDefecto
+          await Preferences.remove({ key: 'miYoutubeKeyCustom' })
+          if (window.actualizarYoutubeKey) window.actualizarYoutubeKey(miYoutubeKey)
+          inputYoutubeKey.value = miYoutubeKey
+          alert('Llave restaurada.')
+        } catch (e) {
+          console.error(e)
+        }
+      }
+    })
+  }
 }

@@ -1,14 +1,8 @@
-/* eslint-disable no-empty */
-/* eslint-disable no-unused-vars */
 import '../../../src/styles.css'
 import { Preferences } from '@capacitor/preferences'
 import { Filesystem, Directory } from '@capacitor/filesystem'
 import { MediaSession } from '@capgo/capacitor-media-session'
 import { App } from '@capacitor/app'
-import { initCarMode } from './modules/carMode.js'
-import { initStorageManager } from './modules/storageManager.js'
-import { initRecommendations } from './modules/recommendations.js'
-import { initApiConfig } from './modules/apiConfig.js'
 
 // --- 1. SELECCIÓN DE ELEMENTOS DEL DOM ---
 const vistaBusqueda = document.getElementById('vista-busqueda')
@@ -78,7 +72,7 @@ const listaColaFull = document.getElementById('listaColaFull')
 const getNombreSeguroThumb = (titulo) => titulo.replace(/[\\/:*?"<>|]/g, '') + '_thumb.jpg'
 
 // 1. Tu arsenal de llaves de RapidAPI
-let rapidApiKeys = [
+const rapidApiKeys = [
   '2dd1b04385msh1bc56d17543f5e5p1b84a0jsn4fc3c347c60c',
   '6c86310b16mshb70def43c1f5742p1e208fjsn44350803e21',
   '38922b1fcbmshf564bafab7c7fe3p1c0b5djsn8053c1f76a5',
@@ -86,23 +80,9 @@ let rapidApiKeys = [
   '9f85584960msha701e1cedb5919cp1622acjsn80c0f3ccc86e',
   '63a6a44f0dmshc719d6f250cee76p1a1d68jsn36406a186236'
 ]
-window.llavesPorDefecto = [...rapidApiKeys]
 
+// 2. El rastreador de la llave actual
 let indiceLlaveActual = 0
-
-// Llave de YouTube (Búsquedas y metadatos)
-let youtubeApiKey = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
-window.youtubeKeyPorDefecto = youtubeApiKey
-
-// Permite a los módulos sobreescribir las llaves al cargar
-window.actualizarLlavesExternas = (nuevasLlaves) => {
-  rapidApiKeys = nuevasLlaves
-  indiceLlaveActual = 0
-}
-
-window.actualizarYoutubeKey = (nuevaLlave) => {
-  youtubeApiKey = nuevaLlave
-}
 
 // --- 2. ESTADO GLOBAL ---
 let colaDeReproduccion = []
@@ -129,24 +109,10 @@ const apiMovil = {
           titulo: f.name.replace('.mp3', ''),
           rutaAbsoluta: f.name
         }))
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
+      await Filesystem.mkdir({ path: 'MiMusicaMVP', directory: Directory.Data, recursive: true })
       return []
-    }
-  },
-
-  obtenerTamanioCarpeta: async () => {
-    try {
-      const result = await Filesystem.readdir({ path: 'MiMusicaMVP', directory: Directory.Data })
-      let totalBytes = 0
-      for (const file of result.files) {
-        if (file.name.endsWith('.mp3') && file.size) {
-          totalBytes += file.size
-        }
-      }
-      const mb = (totalBytes / (1024 * 1024)).toFixed(2)
-      return { bytes: totalBytes, formateado: `${mb} MB` }
-    } catch (e) {
-      return { bytes: 0, formateado: '0 MB' }
     }
   },
 
@@ -159,6 +125,7 @@ const apiMovil = {
         directory: Directory.Data
       })
       return window.Capacitor ? window.Capacitor.convertFileSrc(fileUri.uri) : fileUri.uri
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return null // No hay miniatura guardada localmente
     }
@@ -173,6 +140,7 @@ const apiMovil = {
         directory: Directory.Data
       })
       return window.Capacitor ? window.Capacitor.convertFileSrc(fileUri.uri) : fileUri.uri
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return null
     }
@@ -189,11 +157,13 @@ const apiMovil = {
       // Borramos la miniatura si existe (en bloque try interno para evitar caídas si no tiene)
       try {
         await Filesystem.deleteFile({ path: `MiMusicaMVP/${thumbName}`, directory: Directory.Data })
+        // eslint-disable-next-line no-unused-vars
       } catch (e) {
         console.log('No había miniatura física que borrar.')
       }
 
       return true
+      // eslint-disable-next-line no-unused-vars
     } catch (error) {
       return false
     }
@@ -201,7 +171,7 @@ const apiMovil = {
 
   buscarMusica: async (query) => {
     try {
-      const API_KEY = youtubeApiKey
+      const API_KEY = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
       const searchUrl = `https://www.googleapis.com/youtube/v3/search?part=snippet&maxResults=30&q=${encodeURIComponent(query)}&type=video&key=${API_KEY}`
       const searchRes = await fetch(searchUrl)
       if (!searchRes.ok) throw new Error('Error en búsqueda')
@@ -229,7 +199,7 @@ const apiMovil = {
           .replace(/&amp;/g, '&'),
         duration: mapaDuraciones[video.id.videoId] || '0:00',
         url: `https://youtube.com/watch?v=${video.id.videoId}`,
-        thumbnail: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url
+        thumbnail: video.snippet.thumbnails.high.url
       }))
     } catch (error) {
       console.error(error)
@@ -366,7 +336,7 @@ const apiMovil = {
   // --- NUEVO: Obtener detalles de un video específico por su ID ---
   obtenerDetallesVideoPorId: async (videoId) => {
     try {
-      const API_KEY = youtubeApiKey
+      const API_KEY = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
       const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${videoId}&key=${API_KEY}`
       const res = await fetch(url)
       const data = await res.json()
@@ -382,7 +352,7 @@ const apiMovil = {
           .replace(/&amp;/g, '&'),
         duration: convertirDuracionYouTube(video.contentDetails.duration),
         url: `https://youtube.com/watch?v=${video.id}`,
-        thumbnail: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url || 'default_thumbnail_url_here'
+        thumbnail: video.snippet.thumbnails.high?.url || video.snippet.thumbnails.default?.url
       }
     } catch (e) {
       console.error(e)
@@ -393,11 +363,12 @@ const apiMovil = {
   // --- NUEVO: Obtener el título oficial de una Playlist de YouTube ---
   obtenerNombrePlaylistYouTube: async (playlistId) => {
     try {
-      const API_KEY = youtubeApiKey
+      const API_KEY = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
       const url = `https://www.googleapis.com/youtube/v3/playlists?part=snippet&id=${playlistId}&key=${API_KEY}`
       const res = await fetch(url)
       const data = await res.json()
       return data.items?.[0]?.snippet?.title || 'Mix Importado'
+      // eslint-disable-next-line no-unused-vars
     } catch (e) {
       return 'Mix Importado'
     }
@@ -406,7 +377,7 @@ const apiMovil = {
   // --- NUEVO: Traer todas las canciones de una Playlist de YouTube ---
   obtenerVideosDePlaylist: async (playlistId) => {
     try {
-      const API_KEY = youtubeApiKey
+      const API_KEY = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
       // Traemos las primeras 50 canciones (límite de la API por petición)
       const url = `https://www.googleapis.com/youtube/v3/playlistItems?part=snippet,contentDetails&maxResults=50&playlistId=${playlistId}&key=${API_KEY}`
       const res = await fetch(url)
@@ -436,7 +407,7 @@ const apiMovil = {
             .replace(/&#39;/g, "'")
             .replace(/&amp;/g, '&'),
           urlYoutube: `https://youtube.com/watch?v=${vId}`,
-          thumbnail: data.items[0].snippet.thumbnails.high?.url || data.items[0].snippet.thumbnails.default?.url || item.snippet.thumbnails.default?.url,
+          thumbnail: item.snippet.thumbnails.high?.url || item.snippet.thumbnails.default?.url,
           duracion: mapaDuraciones[vId] || '0:00'
         }
       })
@@ -449,7 +420,7 @@ const apiMovil = {
   // --- NUEVO: Traer detalles de múltiples videos a la vez (Para el Lector QR) ---
   obtenerDetallesVideosEnLote: async (ids) => {
     try {
-      const API_KEY = youtubeApiKey
+      const API_KEY = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
       // La API de YouTube permite pedir hasta 50 videos a la vez separados por comas
       const loteIds = ids.slice(0, 50).join(',')
       const url = `https://www.googleapis.com/youtube/v3/videos?part=snippet,contentDetails&id=${loteIds}&key=${API_KEY}`
@@ -477,6 +448,7 @@ const apiMovil = {
 
 if (typeof window.api === 'undefined') window.api = apiMovil
 
+// --- LÓGICA DEL BOTÓN FÍSICO ATRÁS (CON SEGURO DE DESCARGAS) ---
 let tiempoUltimoBack = 0
 App.addListener('backButton', async () => {
   // 1. Cerrar reproductor fullscreen
@@ -591,8 +563,8 @@ function renderizarRecientes() {
 
     btn.className = 'reciente-item'
     btn.innerHTML = `
-  <span><i class="ph ph-magnifying-glass"></i> ${texto}</span>
-  <span class="eliminar-reciente"><i class="ph-bold ph-x"></i></span>
+  <span>🔎 ${texto}</span>
+  <span class="eliminar-reciente">✕</span>
 `
     btn.addEventListener('click', () => {
       inputBusqueda.value = texto
@@ -642,9 +614,7 @@ function formatearTiempo(segundos) {
 }
 
 function convertirDuracionYouTube(isoDuration) {
-  if (!isoDuration || isoDuration === 'P0D') return 'En vivo'
   const match = isoDuration.match(/PT(\d+H)?(\d+M)?(\d+S)?/)
-  if (!match) return '0:00'
   const horas = parseInt(match[1]) || 0
   const minutos = parseInt(match[2]) || 0
   const segundos = parseInt(match[3]) || 0
@@ -681,8 +651,8 @@ btnPlayPause.addEventListener('click', conmutarReproduccion)
 btnPlayPauseFull.addEventListener('click', conmutarReproduccion)
 
 reproductor.addEventListener('play', () => {
-  btnPlayPause.innerHTML = '<i class="ph-fill ph-pause"></i>'
-  btnPlayPauseFull.innerHTML = '<i class="ph-fill ph-pause"></i>'
+  btnPlayPause.innerText = '⏸'
+  btnPlayPauseFull.innerText = '⏸'
   imgDiscoFull.style.animationPlayState = 'running'
   if (colaDeReproduccion.length > 0) {
     const cancion = colaDeReproduccion[indiceCancionActual]
@@ -703,8 +673,8 @@ reproductor.addEventListener('play', () => {
 })
 
 reproductor.addEventListener('pause', () => {
-  btnPlayPause.innerHTML = '<i class="ph-fill ph-play"></i>'
-  btnPlayPauseFull.innerHTML = '<i class="ph-fill ph-play"></i>'
+  btnPlayPause.innerText = '▶'
+  btnPlayPauseFull.innerText = '▶'
   imgDiscoFull.style.animationPlayState = 'paused'
   MediaSession.setPlaybackState({ playbackState: 'paused' })
 })
@@ -769,7 +739,7 @@ function generarOrdenAleatorio(indiceFijo) {
   // 2. Mezclamos los índices de forma aleatoria
   for (let i = poolAleatorio.length - 1; i > 0; i--) {
     const j = Math.floor(Math.random() * (i + 1))
-      ;[poolAleatorio[i], poolAleatorio[j]] = [poolAleatorio[j], poolAleatorio[i]]
+    ;[poolAleatorio[i], poolAleatorio[j]] = [poolAleatorio[j], poolAleatorio[i]]
   }
 
   // 3. Ponemos la canción actual al principio para que el reproductor no salte
@@ -914,14 +884,12 @@ async function reproductorCentralControl() {
   // --- NUEVO: Inteligencia Offline para Notificaciones ---
   let caratulaFinal = cancion.thumbnail || 'https://cdn-icons-png.flaticon.com/512/26/26307.png'
   try {
-    let rutaImgLocal = null
-    if (!window.electron) {
-      rutaImgLocal = await apiMovil.verificarThumbnail(cancion.titulo)
-    }
+    const rutaImgLocal = await window.api.verificarThumbnail(cancion.titulo)
     if (rutaImgLocal) {
       caratulaFinal = rutaImgLocal
     }
-  } catch (e) { }
+    // eslint-disable-next-line no-unused-vars, no-empty
+  } catch (e) {}
 
   // Sincronización de metadatos nativos (Capacitor)
   MediaSession.setMetadata({
@@ -951,8 +919,8 @@ function detenerReproductor() {
   barraProgresoFull.value = 0
   tiempoActual.innerText = '0:00'
   tiempoActualFull.innerText = '0:00'
-  btnPlayPause.innerHTML = '<i class="ph-fill ph-play"></i>'
-  btnPlayPauseFull.innerHTML = '<i class="ph-fill ph-play"></i>'
+  btnPlayPause.innerText = '▶'
+  btnPlayPauseFull.innerText = '▶'
   textoReproductor.innerText = 'No hay música sonando'
   tituloFull.innerText = 'No hay música sonando'
   artistaFull.innerText = '--'
@@ -1002,7 +970,7 @@ btnAleatorio.addEventListener('click', async () => {
   }
 
   sincronizarBotonesAleatorio()
-  mostrarToast(modoAleatorio ? 'Modo aleatorio encendido [ON]' : 'Modo aleatorio apagado [OFF]')
+  mostrarToast(modoAleatorio ? 'Modo aleatorio encendido 🔀' : 'Modo aleatorio apagado ➡️')
   await guardarProgreso()
 })
 btnAleatorioFull.addEventListener('click', () => btnAleatorio.click())
@@ -1032,10 +1000,7 @@ function cambiarPestaña(vistaAActivar, botonAActivar) {
 // 4. Conectamos los clics de tu HTML con la función maestra
 btnTabBuscar.addEventListener('click', () => cambiarPestaña(vistaBusqueda, btnTabBuscar))
 btnTabBiblioteca.addEventListener('click', () => cambiarPestaña(vistaBiblioteca, btnTabBiblioteca))
-btnTabPerfil.addEventListener('click', () => {
-  cambiarPestaña(vistaPerfil, btnTabPerfil)
-  if (storageManager) storageManager.updateSize()
-})
+btnTabPerfil.addEventListener('click', () => cambiarPestaña(vistaPerfil, btnTabPerfil))
 
 // --- 7. RENDERIZADO MAESTRO DE PLAYLISTS (MÁXIMO RENDIMIENTO Y OFFLINE) ---
 
@@ -1055,6 +1020,7 @@ async function obtenerCacheLocal() {
       if (name.endsWith('_thumb.jpg')) thumbs.add(name.replace('_thumb.jpg', ''))
     })
     return { mp3, thumbs, baseUrl }
+    // eslint-disable-next-line no-unused-vars
   } catch (e) {
     return { mp3: new Set(), thumbs: new Set(), baseUrl: '' }
   }
@@ -1173,7 +1139,8 @@ async function actualizarInterfazPlaylists() {
         try {
           const u = new URL(track.urlYoutube)
           videoId = u.hostname.includes('youtu.be') ? u.pathname.slice(1) : u.searchParams.get('v')
-        } catch (e) { }
+          // eslint-disable-next-line no-unused-vars, no-empty
+        } catch (e) {}
       }
 
       // 2. El Doble Escudo (Original -> Servidor Anti-Bloqueos -> Icono Genérico)
@@ -1272,7 +1239,7 @@ async function actualizarInterfazPlaylists() {
 
       // --- NUEVO: Botón de Compartir por QR ---
       const btnCompartirQR = document.createElement('button')
-      btnCompartirQR.innerHTML = '<i class="ph-bold ph-link"></i>'
+      btnCompartirQR.innerHTML = '🔗'
       btnCompartirQR.className = 'btn-compartir-playlist'
       btnCompartirQR.style.cssText =
         estiloBotonUniforme + 'background-color: #00bcd4; color: black;'
@@ -1307,11 +1274,11 @@ async function actualizarInterfazPlaylists() {
             'background-color: #333; color: white; width: auto; padding: 0 15px; border-radius: 20px;'
           btnLote.disabled = true
         } else if (faltanPorDescargar) {
-          btnLote.innerHTML = '<i class="ph-bold ph-download-simple"></i>'
+          btnLote.innerHTML = '⬇️'
           btnLote.style.cssText = estiloBotonUniforme + 'background-color: #333; color: white;'
           btnLote.disabled = false
         } else {
-          btnLote.innerHTML = '<i class="ph-bold ph-check-circle"></i>'
+          btnLote.innerHTML = '✔️'
           btnLote.style.cssText = estiloBotonUniforme + 'background-color: #4CAF50; color: white;'
           btnLote.disabled = true
         }
@@ -1319,7 +1286,7 @@ async function actualizarInterfazPlaylists() {
         divAccionesPl.appendChild(btnLote)
 
         const btnLimpiarDescargas = document.createElement('button')
-        btnLimpiarDescargas.innerHTML = '<i class="ph-bold ph-broom"></i>'
+        btnLimpiarDescargas.innerHTML = '🧹'
         btnLimpiarDescargas.style.cssText =
           estiloBotonUniforme + 'background-color: #ff9800; color: black;'
         btnLimpiarDescargas.addEventListener('click', async () => {
@@ -1327,7 +1294,7 @@ async function actualizarInterfazPlaylists() {
             `¿Deseas borrar los MP3 descargados de "${nombre}" para liberar espacio?`
           )
           if (seguro) {
-            btnLimpiarDescargas.innerHTML = '<i class="ph-bold ph-hourglass"></i>'
+            btnLimpiarDescargas.innerHTML = '⏳'
             let borrados = 0
             for (const track of misPlaylists[nombre]) {
               const nombreLimpio = track.titulo.replace(/[\\/:*?"<>|]/g, '')
@@ -1345,7 +1312,7 @@ async function actualizarInterfazPlaylists() {
       }
 
       const btnEliminarPl = document.createElement('button')
-      btnEliminarPl.innerHTML = '<i class="ph-bold ph-trash"></i>'
+      btnEliminarPl.innerHTML = '🗑️'
       btnEliminarPl.className = 'btn-eliminar-playlist'
       btnEliminarPl.style.cssText = estiloBotonUniforme + 'background-color: #d32f2f; color: white;'
       btnEliminarPl.addEventListener('click', async () => {
@@ -1398,8 +1365,8 @@ async function actualizarInterfazPlaylists() {
             'width:36px; height:36px; padding:0; display:flex; align-items:center; justify-content:center; border:none; border-radius:6px; font-weight:bold; font-size:1.1rem; flex-shrink: 0;'
 
           btnBajarHTML = descargada
-            ? `<button class="btn-borrar-descarga" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:#ff9800; color:black;"><i class="ph-bold ph-trash"></i></button>`
-            : `<button class="btn-descargar" data-url="${track.urlYoutube}" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:var(--accent); color:black;"><i class="ph-bold ph-download-simple"></i></button>`
+            ? `<button class="btn-borrar-descarga" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:#ff9800; color:black;">🗑️</button>`
+            : `<button class="btn-descargar" data-url="${track.urlYoutube}" data-titulo="${titSeguro}" style="${estiloItemOpcion} background-color:var(--accent); color:black;">⬇️</button>`
         }
 
         const comboMover = renderOpcionesCombo(
@@ -1419,8 +1386,8 @@ async function actualizarInterfazPlaylists() {
             videoId = u.hostname.includes('youtu.be')
               ? u.pathname.slice(1)
               : u.searchParams.get('v')
-
-          } catch (e) { }
+            // eslint-disable-next-line no-unused-vars, no-empty
+          } catch (e) {}
         }
 
         // 2. El Doble Escudo (Original -> Servidor Anti-Bloqueos -> Icono Genérico)
@@ -1622,91 +1589,66 @@ function actualizarTodosLosCombobox() {
 // --- BÚSQUEDA Y MANEJADORES DE CLICS (Funciones Tradicionales a prueba de errores) ---
 btnBuscar.addEventListener('click', async () => {
   const query = inputBusqueda.value.trim()
-  console.log('Botón buscar clickeado, query:', query)
 
   if (!navigator.onLine) {
-    console.log('No hay internet')
     mostrarToast('No puedes buscar sin internet 📡, conectate a una red, o busca en tu biblioteca.')
     return
   }
 
-  if (!query) {
-    console.log('Query vacía, retornando')
+  if (!query) return
+  guardarBusquedaReciente(query)
+  inicioBusqueda.style.display = 'none'
+  listaBusqueda.innerHTML =
+    '<li style="padding:20px; color:var(--text-muted);">Consultando servidores...</li>'
+
+  const data = await window.api.buscarMusica(query)
+  listaBusqueda.innerHTML = ''
+
+  if (data.length === 0) {
+    listaBusqueda.innerHTML = '<li style="padding:20px;">No se encontraron resultados.</li>'
     return
   }
-  
-  try {
-    guardarBusquedaReciente(query)
-    console.log('Búsqueda reciente guardada')
-    
-    inicioBusqueda.style.display = 'none'
-    console.log('Se ocultó inicioBusqueda')
-    
-    listaBusqueda.innerHTML =
-      '<li style="padding:20px; color:var(--text-muted);">Consultando servidores...</li>'
-    console.log('Se estableció Consultando servidores...')
 
-    console.log('Llamando a apiMovil.buscarMusica (API oficial para evitar bug de yt-search)...')
-    const data = await apiMovil.buscarMusica(query)
-    console.log('Respuesta de buscarMusica:', data)
-    
-    listaBusqueda.innerHTML = ''
+  for (const video of data) {
+    const enDisco = await window.api.verificarDescarga(video.title)
+    const safeTitle = video.title.replace(/"/g, '&quot;').replace(/'/g, '&#39;')
 
-    if (!data || data.length === 0) {
-      console.log('Data está vacía o undefined')
-      listaBusqueda.innerHTML = '<li style="padding:20px;">No se encontraron resultados.</li>'
-      return
-    }
+    let actionBtn = enDisco
+      ? `<button disabled style="background-color:#1e3c20; color:#4CAF50; border:none; padding:8px 12px; border-radius:4px;">[✓]</button>`
+      : `<button class="btn-descargar" data-url="${video.url}" data-titulo="${safeTitle}" data-thumbnail="${video.thumbnail}" style="background-color:var(--accent); color:black; border:none; padding:8px 12px; border-radius:4px; font-weight:bold;">⬇️</button>`
 
-    console.log('Iniciando bucle de', data.length, 'videos')
-    for (const video of data) {
-      // console.log('Procesando video:', video.title)
-      const enDisco = await window.api.verificarDescarga(video.title)
-      const safeTitle = video.title ? video.title.replace(/"/g, '&quot;').replace(/'/g, '&#39;') : 'Desconocido'
+    // Pasamos de forma consistente url, thumbnail y duracion
+    const combo = renderOpcionesCombo(
+      video.title,
+      video.url,
+      'online',
+      '',
+      video.thumbnail,
+      video.duration
+    )
+    const badge = enDisco ? '💾' : '☁️'
+    const miniaturaHTML = video.thumbnail
+      ? `<img src="${video.thumbnail}" class="song-thumbnail" alt="Cover" referrerpolicy="no-referrer" onerror="this.src='https://cdn-icons-png.flaticon.com/512/26/26307.png'">`
+      : `<div class="song-thumbnail" style="display:flex; justify-content:center; align-items:center; background:#333; font-size:1.5rem;">🎵</div>`
 
-      let actionBtn = enDisco
-        ? `<button disabled style="background-color:#1e3c20; color:#4CAF50; border:none; padding:8px 12px; border-radius:4px;">[✓]</button>`
-        : `<button class="btn-descargar" data-url="${video.url}" data-titulo="${safeTitle}" data-thumbnail="${video.thumbnail}" style="background-color:var(--accent); color:black; border:none; padding:8px 12px; border-radius:4px; font-weight:bold;">⬇️</button>`
-
-      // Pasamos de forma consistente url, thumbnail y duracion
-      const combo = renderOpcionesCombo(
-        video.title || 'Desconocido',
-        video.url,
-        'online',
-        '',
-        video.thumbnail,
-        video.duration
-      )
-      const badge = enDisco ? '💾' : '☁️'
-      const miniaturaHTML = video.thumbnail
-        ? `<img src="${video.thumbnail}" class="song-thumbnail" alt="Cover" referrerpolicy="no-referrer" onerror="this.src='https://cdn-icons-png.flaticon.com/512/26/26307.png'">`
-        : `<div class="song-thumbnail" style="display:flex; justify-content:center; align-items:center; background:#333; font-size:1.5rem;">🎵</div>`
-
-      const li = document.createElement('li')
-      li.className = 'song-item'
-      // Asegurar que el elemento es visible
-      li.style.display = 'flex'
-      li.innerHTML = `
-        <div class="song-info-wrapper">
-          ${miniaturaHTML}
-          <div class="song-details">
-            <span class="song-title">${badge} ${video.title}</span>
-            <span class="song-meta">${video.duration}</span>
-          </div>
-          <button class="btn-play-mini btn-reproducir" data-url="${video.url}" data-titulo="${safeTitle}" data-thumbnail="${video.thumbnail}">▶</button>
-          <button class="btn-opciones">☰</button>
-        </div> 
-        <div class="menu-opciones">
-          ${actionBtn}
-          ${combo}
+    const li = document.createElement('li')
+    li.className = 'song-item'
+    li.innerHTML = `
+      <div class="song-info-wrapper">
+        ${miniaturaHTML}
+        <div class="song-details">
+          <span class="song-title">${badge} ${video.title}</span>
+          <span class="song-meta">${video.duration}</span>
         </div>
-      `
-      listaBusqueda.appendChild(li)
-    }
-    console.log('Bucle finalizado. Total hijos de listaBusqueda:', listaBusqueda.children.length)
-  } catch (err) {
-    console.error('Error FATAL en btnBuscar:', err)
-    listaBusqueda.innerHTML = '<li style="padding:20px; color:red;">Ocurrió un error interno al buscar. Abre DevTools para ver más detalles.</li>'
+        <button class="btn-play-mini btn-reproducir" data-url="${video.url}" data-titulo="${safeTitle}" data-thumbnail="${video.thumbnail}">▶</button>
+        <button class="btn-opciones">☰</button>
+      </div> 
+      <div class="menu-opciones">
+        ${actionBtn}
+        ${combo}
+      </div>
+    `
+    listaBusqueda.appendChild(li)
   }
 })
 
@@ -2000,7 +1942,7 @@ async function repararDuracionesAntiguas() {
 
   if (idsParaArreglar.length === 0) return
   try {
-    const API_KEY = youtubeApiKey
+    const API_KEY = 'AIzaSyCg19z6JcQGpRHAXkIv65pHKT5dZfwFX4U'
     for (let i = 0; i < idsParaArreglar.length; i += 50) {
       const loteIds = idsParaArreglar.slice(i, i + 50).join(',')
       const res = await fetch(
@@ -2085,14 +2027,11 @@ async function actualizarUIFullscreen() {
   // Inteligencia: Si está en el disco o era offline desde el inicio, es Local
   artistaFull.innerText = enDisco || cancion.tipo === 'offline' ? 'Local 💾' : 'Nube ☁️'
 
-  // 2. Motor de Miniatura Local (Solo en móvil)
-  let rutaImagenLocal = null
-  if (!window.electron) {
-    rutaImagenLocal = await apiMovil.verificarThumbnail(cancion.titulo)
-    if (!rutaImagenLocal && navigator.onLine && cancion.thumbnail) {
-      const nuevaRuta = await apiMovil.descargarThumbnailSuelto(cancion.titulo, cancion.thumbnail)
-      if (nuevaRuta) rutaImagenLocal = nuevaRuta
-    }
+  // 2. Motor de Miniatura Local
+  let rutaImagenLocal = await window.api.verificarThumbnail(cancion.titulo)
+  if (!rutaImagenLocal && navigator.onLine && cancion.thumbnail) {
+    const nuevaRuta = await window.api.descargarThumbnailSuelto(cancion.titulo, cancion.thumbnail)
+    if (nuevaRuta) rutaImagenLocal = nuevaRuta
   }
   const caratulaFinal =
     rutaImagenLocal || cancion.thumbnail || 'https://cdn-icons-png.flaticon.com/512/26/26307.png'
@@ -2276,10 +2215,7 @@ async function renderizarColaFull() {
   const datosListos = await Promise.all(
     cancionesAMostrar.map(async (track) => {
       const enDisco = await window.api.verificarDescarga(track.titulo)
-      let rutaImgLocal = null
-      if (!window.electron) {
-        rutaImgLocal = await apiMovil.verificarThumbnail(track.titulo)
-      }
+      const rutaImgLocal = await window.api.verificarThumbnail(track.titulo)
       return {
         ...track,
         enDisco,
@@ -2307,8 +2243,8 @@ async function renderizarColaFull() {
       try {
         const u = new URL(track.urlYoutube)
         videoId = u.hostname.includes('youtu.be') ? u.pathname.slice(1) : u.searchParams.get('v')
-
-      } catch (e) { }
+        // eslint-disable-next-line no-unused-vars, no-empty
+      } catch (e) {}
     }
 
     // 2. El Doble Escudo (Original -> Servidor Anti-Bloqueos -> Icono Genérico)
@@ -2427,7 +2363,7 @@ async function comprobarInternetReal() {
     // Intentamos cargar un archivo minúsculo sin caché y sin bloqueos de seguridad (no-cors)
     await fetch('https://www.google.com/favicon.ico', { mode: 'no-cors', cache: 'no-store' })
     return true // Si no hay error, hay internet real
-
+    // eslint-disable-next-line no-unused-vars
   } catch (error) {
     return false // Si falla el fetch, estamos desconectados
   }
@@ -2621,7 +2557,7 @@ if (btnImportarCancion) {
           videoId = url.searchParams.get('v')
         }
       }
-
+      // eslint-disable-next-line no-unused-vars
     } catch (e) {
       // Plan B: Si pegan solo el ID de 11 caracteres en vez de un enlace completo
       if (urlText.length === 11) videoId = urlText
@@ -2632,7 +2568,7 @@ if (btnImportarCancion) {
       mostrarToast('❌ Enlace de canción inválido o no soportado.')
       return
     }
-    const videoDetails = await apiMovil.obtenerDetallesVideoPorId(videoId)
+    const videoDetails = await window.api.obtenerDetallesVideoPorId(videoId)
 
     // Preguntamos al usuario a qué playlist añadirla
     const nombrePl = await pedirNombrePlaylist(
@@ -2696,10 +2632,10 @@ if (btnImportarMix) {
     btnImportarMix.style.backgroundColor = '#333'
 
     // 1. Buscamos el nombre oficial de la lista
-    const nombreOficial = await apiMovil.obtenerNombrePlaylistYouTube(playlistId)
+    const nombreOficial = await window.api.obtenerNombrePlaylistYouTube(playlistId)
 
     // 2. Traemos las canciones
-    const cancionesEncontradas = await apiMovil.obtenerVideosDePlaylist(playlistId)
+    const cancionesEncontradas = await window.api.obtenerVideosDePlaylist(playlistId)
 
     if (cancionesEncontradas.length === 0) {
       mostrarToast('❌ No se pudieron extraer canciones de este enlace.')
@@ -2908,7 +2844,7 @@ async function generarQR(nombrePlaylist, canciones) {
         const url = new URL(c.urlYoutube)
         if (url.hostname.includes('youtu.be')) return url.pathname.slice(1)
         return url.searchParams.get('v')
-
+        // eslint-disable-next-line no-unused-vars
       } catch (e) {
         return null
       }
@@ -2995,7 +2931,7 @@ async function procesarTextoQR(decodedText) {
 
   mostrarToast(`Reconstruyendo ${idsArray.length} canciones... ⏳`)
 
-  const cancionesRecuperadas = await apiMovil.obtenerDetallesVideosEnLote(idsArray)
+  const cancionesRecuperadas = await window.api.obtenerDetallesVideosEnLote(idsArray)
 
   if (cancionesRecuperadas.length === 0) {
     mostrarToast('❌ Error de red al reconstruir la playlist.')
@@ -3049,8 +2985,8 @@ if (btnAbrirEscaner) {
 
           await procesarTextoQR(decodedText) // Llamamos a la función maestra
         },
-
-        (errorMessage) => { } // Ignoramos errores de enfoque
+        // eslint-disable-next-line no-unused-vars
+        (errorMessage) => {} // Ignoramos errores de enfoque
       )
     } catch (err) {
       console.error(err)
@@ -3097,7 +3033,7 @@ if (btnEscanearImagen && inputQrImagen) {
       inputQrImagen.value = '' // Limpiamos el input por si quiere subir la misma foto luego
       await procesarTextoQR(decodedText) // Llamamos a la función maestra
 
-
+      // eslint-disable-next-line no-unused-vars
     } catch (err) {
       mostrarToast('❌ No se detectó ningún código QR en la imagen seleccionada.')
       inputQrImagen.value = ''
@@ -3263,156 +3199,3 @@ async function abrirModalGestionCancion(pOrigen, titulo) {
     document.body.appendChild(overlay)
   })
 }
-
-// ==========================================
-//   NUEVO: ONBOARDING Y ECUALIZADOR (NEÓN)
-// ==========================================
-
-// --- ONBOARDING LOGIC ---
-const onboardingOverlay = document.getElementById('onboarding-overlay')
-const btnEmpezarOnboarding = document.getElementById('btnEmpezarOnboarding')
-
-if (onboardingOverlay && btnEmpezarOnboarding) {
-  const hasSeenOnboarding = localStorage.getItem('myplayer_onboarding_done')
-  if (!hasSeenOnboarding) {
-    onboardingOverlay.classList.remove('vista-oculta')
-    btnEmpezarOnboarding.addEventListener('click', () => {
-      onboardingOverlay.classList.add('fade-out')
-      localStorage.setItem('myplayer_onboarding_done', 'true')
-      setTimeout(() => {
-        onboardingOverlay.classList.add('vista-oculta')
-      }, 500)
-    })
-  }
-}
-
-// --- ECUALIZADOR VISUAL (WEB AUDIO API) ---
-const canvasEcualizador = document.getElementById('ecualizadorVisual')
-if (canvasEcualizador && reproductor) {
-  const ctx = canvasEcualizador.getContext('2d')
-  canvasEcualizador.width = 320
-  canvasEcualizador.height = 320
-
-  let audioContext = null
-  let analyser = null
-  let dataArray = null
-  let source = null
-
-  const initAudio = () => {
-    if (!audioContext) {
-      try {
-        reproductor.crossOrigin = 'anonymous'
-        audioContext = new (window.AudioContext || window.webkitAudioContext)()
-        analyser = audioContext.createAnalyser()
-        source = audioContext.createMediaElementSource(reproductor)
-
-        source.connect(analyser)
-        analyser.connect(audioContext.destination)
-
-        analyser.fftSize = 128
-        const bufferLength = analyser.frequencyBinCount
-        dataArray = new Uint8Array(bufferLength)
-
-        dibujarEcualizador()
-      } catch (e) {
-        console.warn('Ecualizador no disponible por políticas de CORS en esta fuente de audio.', e)
-      }
-    }
-    if (audioContext && audioContext.state === 'suspended') {
-      audioContext.resume()
-    }
-  }
-
-  reproductor.addEventListener('play', initAudio)
-
-  function dibujarEcualizador() {
-    requestAnimationFrame(dibujarEcualizador)
-    if (!analyser) return
-
-    analyser.getByteFrequencyData(dataArray)
-    ctx.clearRect(0, 0, canvasEcualizador.width, canvasEcualizador.height)
-
-    const centerX = canvasEcualizador.width / 2
-    const centerY = canvasEcualizador.height / 2
-    const radius = 140
-
-    const bars = dataArray.length
-    const barWidth = (2 * Math.PI) / bars
-
-    for (let i = 0; i < bars; i++) {
-      const barHeight = (dataArray[i] / 255) * 35
-      const angle = i * barWidth
-
-      const x1 = centerX + Math.cos(angle) * radius
-      const y1 = centerY + Math.sin(angle) * radius
-      const x2 = centerX + Math.cos(angle) * (radius + barHeight)
-      const y2 = centerY + Math.sin(angle) * (radius + barHeight)
-
-      ctx.beginPath()
-      ctx.moveTo(x1, y1)
-      ctx.lineTo(x2, y2)
-      ctx.lineWidth = 4
-      ctx.strokeStyle = `rgba(0, 240, 255, ${Math.max(0.2, dataArray[i] / 255)})`
-      ctx.lineCap = 'round'
-      ctx.stroke()
-    }
-  }
-}
-
-// --- MINI-PLAYER (PICTURE IN PICTURE) ---
-const btnMiniPlayer = document.getElementById('btnMiniPlayer')
-let isMiniPlayerActive = false
-
-if (btnMiniPlayer) {
-  btnMiniPlayer.addEventListener('click', async () => {
-    if (window.api && window.api.toggleMiniPlayer) {
-      isMiniPlayerActive = !isMiniPlayerActive
-      await window.api.toggleMiniPlayer(isMiniPlayerActive)
-      if (isMiniPlayerActive) {
-        btnMiniPlayer.innerHTML = '<i class="ph-fill ph-picture-in-picture"></i>'
-        btnMiniPlayer.style.color = 'var(--accent)'
-      } else {
-        btnMiniPlayer.innerHTML = '<i class="ph-bold ph-picture-in-picture"></i>'
-        btnMiniPlayer.style.color = 'inherit'
-      }
-    } else {
-      mostrarToast('Modo Mini-Player no disponible (solo en PC)')
-    }
-  })
-}
-
-// --- INIT CAR MODE ---
-initCarMode({
-  onPlayPause: () => btnPlayPauseFull.click(),
-  onPrev: () => btnAnteriorFull.click(),
-  onNext: () => btnSiguienteFull.click()
-})
-
-// --- INIT STORAGE MANAGER ---
-const storageManager = initStorageManager({
-  getPlaylists: () => misPlaylists,
-  onSpaceFreed: (msg) => mostrarToast(msg)
-})
-
-// --- INIT API CONFIG ---
-initApiConfig()
-
-// --- INIT RECOMENDACIONES LOCALES ---
-setTimeout(() => {
-  initRecommendations({
-    getRecientes: () => busquedasRecientes,
-    onPlaySuggested: async (cancionObj) => {
-      // Agregar a la cola y reproducir inmediatamente
-      colaDeReproduccion = [cancionObj]
-      indiceCancionActual = 0
-      poolAleatorio = [0]
-      cursorAleatorio = 0
-      btnPlayPauseFull.click() // Simula el click para abrir el modal si es necesario, 
-      // o llama a reproductorCentralControl directamente
-      await reproductorCentralControl()
-
-      // Abrir fullscreen player automáticamente para mayor inmersión
-      document.getElementById('vista-reproductor').classList.replace('cerrado', 'abierto')
-    }
-  })
-}, 1000) // Cargar despues del render inicial para no bloquear
