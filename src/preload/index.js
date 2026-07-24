@@ -13,7 +13,10 @@ const api = {
   obtenerCarpeta: () => ipcRenderer.invoke('archivo:obtenerCarpeta'),
   // NUEVAS RUTAS: Para la memoria persistente
   cargarDatosLocales: () => ipcRenderer.invoke('datos:cargar'),
-  guardarDatosLocales: (datos) => ipcRenderer.invoke('datos:guardar', datos)
+  guardarDatosLocales: (datos) => ipcRenderer.invoke('datos:guardar', datos),
+  // NUEVA RUTA: Mini-Player
+  toggleMiniPlayer: (activar) => ipcRenderer.invoke('ui:toggleMiniPlayer', activar),
+  obtenerTamanioCarpeta: () => ipcRenderer.invoke('archivo:obtenerTamanioCarpeta')
 }
 
 if (process.contextIsolated) {

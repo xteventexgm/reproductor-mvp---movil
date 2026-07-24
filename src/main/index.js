@@ -1,3 +1,4 @@
+/* eslint-disable no-unused-vars */
 import { app, shell, BrowserWindow, ipcMain, dialog } from 'electron'
 import { join } from 'path'
 import { electronApp, optimizer, is } from '@electron-toolkit/utils'
@@ -180,6 +181,24 @@ app.whenReady().then(() => {
     }
   })
 
+  ipcMain.handle('archivo:obtenerTamanioCarpeta', () => {
+    try {
+      if (!fs.existsSync(carpetaDescargasActual)) return { bytes: 0, formateado: '0 MB' }
+      let totalBytes = 0
+      const archivos = fs.readdirSync(carpetaDescargasActual)
+      for (const archivo of archivos) {
+        if (archivo.endsWith('.mp3')) {
+          const stats = fs.statSync(join(carpetaDescargasActual, archivo))
+          totalBytes += stats.size
+        }
+      }
+      const mb = (totalBytes / (1024 * 1024)).toFixed(2)
+      return { bytes: totalBytes, formateado: `${mb} MB` }
+    } catch (error) {
+      return { bytes: 0, formateado: '0 MB' }
+    }
+  })
+
   ipcMain.handle('archivo:eliminar', (event, titulo) => {
     try {
       const nombreLimpio = titulo.replace(/[\\/:*?"<>|]/g, '')
@@ -206,6 +225,23 @@ app.whenReady().then(() => {
       cancelId: 1
     })
     return result.response === 0
+  })
+
+  // --- NUEVO: MINI-PLAYER FLOTANTE ---
+  ipcMain.handle('ui:toggleMiniPlayer', (event, activar) => {
+    const mainWindow = BrowserWindow.fromWebContents(event.sender)
+    if (!mainWindow) return false
+
+    if (activar) {
+      mainWindow.setAlwaysOnTop(true, 'floating')
+      mainWindow.setSize(350, 600)
+      mainWindow.setResizable(false)
+    } else {
+      mainWindow.setAlwaysOnTop(false)
+      mainWindow.setSize(900, 670)
+      mainWindow.setResizable(true)
+    }
+    return true
   })
 
   createWindow()

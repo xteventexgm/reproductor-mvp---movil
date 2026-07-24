@@ -1730,3 +1730,102 @@ input[type='range']::-webkit-slider-thumb {
   z-index: 1;
   position: relative;
 }
+
+/* ==========================================
+   CAR MODE (MODO CONDUCCIÓN)
+========================================== */
+#vista-car-mode {
+  position: fixed;
+  inset: 0;
+  z-index: 9999; /* Por debajo del onboarding, pero sobre todo lo demás */
+  background: #000; /* Totalmente negro para OLED */
+  display: flex;
+  flex-direction: column;
+  padding: 20px;
+}
+
+.car-header {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 20px 0;
+  border-bottom: 2px solid #333;
+}
+
+#btnExitCarMode {
+  background: #333;
+  color: #fff;
+  border: none;
+  font-size: 1.5rem;
+  padding: 15px 30px;
+  border-radius: 15px;
+  font-weight: bold;
+}
+
+.car-title {
+  color: #ff9800;
+  font-family: 'Orbitron', sans-serif;
+  font-size: 1.2rem;
+  letter-spacing: 2px;
+}
+
+.car-info {
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+  text-align: center;
+  padding: 20px;
+}
+
+#carTitulo {
+  font-size: 3rem;
+  color: #fff;
+  margin-bottom: 15px;
+  line-height: 1.2;
+}
+
+#carArtista {
+  font-size: 2rem;
+  color: var(--accent-cyan);
+}
+
+.car-controls {
+  display: grid;
+  grid-template-columns: 1fr 2fr 1fr;
+  gap: 20px;
+  height: 35vh; /* Ocupa una buena parte inferior */
+  margin-bottom: 20px;
+}
+
+.car-btn {
+  background: #111;
+  border: 2px solid #333;
+  border-radius: 30px;
+  color: #fff;
+  font-size: 3rem;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  transition: background 0.1s;
+}
+
+.car-btn:active {
+  background: #333;
+}
+
+.play-massive {
+  background: var(--accent);
+  color: #000;
+  font-size: 5rem;
+  border: none;
+}
+.play-massive:active {
+  background: var(--accent-cyan);
+}
+
+.sortable-ghost {
+  opacity: 0.4;
+  background-color: rgba(255, 255, 255, 0.1) !important;
+}
