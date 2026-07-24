@@ -8,6 +8,7 @@ import { App } from '@capacitor/app'
 import { initCarMode } from './modules/carMode.js'
 import { initStorageManager } from './modules/storageManager.js'
 import { initRecommendations } from './modules/recommendations.js'
+import { initApiConfig } from './modules/apiConfig.js'
 
 // --- 1. SELECCIÓN DE ELEMENTOS DEL DOM ---
 const vistaBusqueda = document.getElementById('vista-busqueda')
@@ -902,7 +903,6 @@ async function reproductorCentralControl() {
     if (rutaImgLocal) {
       caratulaFinal = rutaImgLocal
     }
-
   } catch (e) { }
 
   // Sincronización de metadatos nativos (Capacitor)
@@ -1037,7 +1037,6 @@ async function obtenerCacheLocal() {
       if (name.endsWith('_thumb.jpg')) thumbs.add(name.replace('_thumb.jpg', ''))
     })
     return { mp3, thumbs, baseUrl }
-
   } catch (e) {
     return { mp3: new Set(), thumbs: new Set(), baseUrl: '' }
   }
@@ -3345,6 +3344,9 @@ const storageManager = initStorageManager({
   getPlaylists: () => misPlaylists,
   onSpaceFreed: (msg) => mostrarToast(msg)
 })
+
+// --- INIT API CONFIG ---
+initApiConfig()
 
 // --- INIT RECOMENDACIONES LOCALES ---
 setTimeout(() => {

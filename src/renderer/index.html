@@ -152,6 +152,32 @@
             <button id="btnCerrarEscaner" style="width: 100%; padding: 10px; background: #d32f2f; color: white; border: none; font-weight: bold;">Cancelar / Cerrar Cámara</button>
           </div>
         </div>
+
+        <!-- =========================
+             CONFIGURACIÓN DE API
+        ========================== -->
+        <div class="settings-section" style="background: var(--bg-card); padding: 20px; border-radius: 12px; margin-bottom: 80px; border: 1px solid var(--border); box-shadow: 0 0 15px rgba(255, 193, 7, 0.1);">
+          <h3 style="color: #ffc107; margin-bottom: 15px; font-size: 1.1rem; display: flex; align-items: center; justify-content: space-between;">
+            <span><i class="ph-fill ph-key"></i> Llaves de API (Descargas)</span>
+            <span id="apiKeysCount" style="font-size: 0.9rem; color: white; background: #333; padding: 4px 8px; border-radius: 12px;">6 llaves</span>
+          </h3>
+          <p style="font-size: 0.8rem; color: #aaa; margin-bottom: 15px;">
+            La aplicación necesita llaves de RapidAPI para descargar música. 
+            <a href="https://rapidapi.com/ytjar/api/youtube-mp36" target="_blank" style="color: #ffc107; text-decoration: underline;">Consigue más llaves aquí</a> (API: youtube-mp36).
+          </p>
+
+          <ul id="apiKeysList" style="list-style: none; margin-bottom: 15px; max-height: 200px; overflow-y: auto; background: #222; border-radius: 8px; padding: 10px;">
+            <!-- Renderizado dinámico de llaves -->
+          </ul>
+
+          <div style="display: flex; gap: 8px; margin-bottom: 10px;">
+            <input type="text" id="inputNewApiKey" placeholder="Pegar nueva API Key..." style="flex: 1; padding: 12px; border-radius: 8px; border: 1px solid #444; background: #333; color: white;">
+            <button id="btnAddApiKey" style="padding: 0 20px; background: #ffc107; color: black; border: none; border-radius: 8px; font-weight: bold;"><i class="ph-bold ph-plus"></i></button>
+          </div>
+          
+          <button id="btnResetApiKeys" style="width: 100%; padding: 10px; border: 1px solid #ffc107; color: #ffc107; background: transparent; border-radius: 8px; font-weight: bold; font-size: 0.85rem;">Restaurar llaves por defecto</button>
+        </div>
+
       </div>
     </main>
 
